@@ -1,6 +1,7 @@
 #include "../config.h"
 #include "uart.h"
 #include <avr/io.h>
+#include <stdio.h>
 
 //Alle funksjonene under er laget i henhold til eksempelkode som er levert
 //i databladet til ATmega162.
@@ -31,4 +32,16 @@ while ( !(UCSR0A & (1<<RXC0)) )
 ;
 /* Get and return received data from buffer */
 return UDR0;
+}
+
+int uart_putchar(char c, FILE *stream) {
+    if (c == '\n') {
+        USART_transmit('\r');   // vanlig å legge til CR før LF for terminaler
+    }
+    USART_transmit(c);
+    return 0;
+}
+
+int uart_getchar(FILE *stream) {
+    return USART_Receive();
 }
