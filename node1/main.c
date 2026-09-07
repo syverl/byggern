@@ -1,28 +1,16 @@
 #include "config.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "drivers/uart.h"
 
-#define SQUARE_PIN PA2
-
-// int main(void)
-// {
-//     DDRA |= (1 << PA2);
-
-//     PORTA |= (1 << PA2);
-
-//     while (1)
-//     {
-//     }
-// }
+#define SQUARE_PIN PA3
 
 
 int main(void) {
-    DDRA |= (1<<SQUARE_PIN);
-
+    USART_init(MYUBRR);
     while (1){
-        PORTA |= (1<<SQUARE_PIN);
-        _delay_ms(10);
-        PORTA &= ~(1<<SQUARE_PIN);
+        USART_transmit('A');
         _delay_ms(10);
     }
 }
+

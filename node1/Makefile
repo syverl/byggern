@@ -1,5 +1,5 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := main.c
+SOURCE_FILES := main.c drivers/uart.c
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
@@ -20,6 +20,7 @@ CFLAGS := -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
 
 .DEFAULT_GOAL := $(BUILD_DIR)/main.hex
+
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
