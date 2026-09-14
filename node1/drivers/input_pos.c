@@ -1,78 +1,32 @@
-#include "../config.h"
 #include "input_pos.h"
+#include "SRAM.h"   // xmem_write() / xmem_read() - deres eksisterende XMEM-driver
+
+#ifndef F_CPU
+#define F_CPU 4915200UL   // ATmega162 klokkefrekvens - må stemme med resten av prosjektet
+#endif
+
 #include <util/delay.h>
 
-#define ADC_ADDR 0x1400
+// Beregnet konverteringstid: t_CONV = (9 * N * 2) / f_CLK
+// Med N = 4 kanaler og f_CLK = 2.4576 MHz gir dette ca. 29.3 us.
+// Vi legger på margin for klokkeusikkerhet og tWBD/tBRD-forsinkelser.
+#define ADC_CONV_DELAY_US  35
 
-static volatile uint8_t *adc = (uint8_t *)ADC_ADDR;
-
-
-// --------------------------------------------------
-// Initialize external memory interface for ADC
-// --------------------------------------------------
-void adc_init(void)
+void adc_max156_start_conversion(void)
 {
-    // Enable external memory interface
-    MCUCR |= (1 << SRE);
-
-    // Wait states
-    MCUCR  |= (1 << SRW10);
-    EMCUCR |= (1 << SRW11);
-
-    // Release required PORTC pins
-    SFIOR |= (1 << XMM2);
+    xmem_write(0x00, ADC_BASE_ADDRESS);
 }
 
-
-// --------------------------------------------------
-// Read one ADC channel
-// --------------------------------------------------
-uint8_t adc_read(uint8_t channel)
+void adc_max156_read_all(uint8_t *buffer)
 {
-    // Start conversion
-    *adc = 0x04;
-
-    // Wait until conversion is finished
-    _delay_us(200);
-
-    // MAX156 returns channels sequentially.
-    // Read and discard values until desired channel.
-    uint8_t value = 0;
-
-    for (uint8_t i = 0; i <= channel; i++)
-    {
-        value = *adc;
+    for (uint8_t i = 0; i < ADC_NUM_CHANNELS; i++) {
+        buffer[i] = xmem_read(ADC_BASE_ADDRESS);
     }
-
-    return value;
 }
 
-
-// --------------------------------------------------
-// Calibrate joystick
-// --------------------------------------------------
-void pos_calibrate(void)
+void adc_max156_convert_and_read(uint8_t *buffer)
 {
-    // Leave empty for now.
-    // Can later store center/min/max values.
-}
-
-
-// --------------------------------------------------
-// Read all joystick/slider positions
-// --------------------------------------------------
-pos_t pos_read(void)
-{
-    pos_t pos;
-
-    // Start one conversion
-    *adc = 0xAA;
-    _delay_us(200);
-
-    // Read sequential ADC results
-    pos.x      = *adc;
-    pos.y      = *adc;
-    pos.slider = *adc;
-
-    return pos;
+    adc_max156_start_conversion();
+    _delay_us(ADC_CONV_DELAY_US);
+    adc_max156_read_all(buffer);
 }

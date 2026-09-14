@@ -1,5 +1,6 @@
 #include "SRAM.h"
 #include <stdio.h>
+#include "../config.h"
 
 
 void SRAM_test(void)
@@ -41,16 +42,20 @@ void SRAM_test(void)
 }
 
 void xmem_init(void) {
-    // MCUCR |= (1 << SRE);       // enable XMEM
-    // SFIOR |= (1 << XMM2);      // sett riktig maskeverdi
         // Enable XMEM
     MCUCR |= (1 << SRE);
-
-    // Maks wait states for hele XMEM-området
-    MCUCR  |= (1 << SRW10);
-    EMCUCR |= (1 << SRW11);
-
     // Frigi nødvendige PORTC-pinner
-    SFIOR |= (1 << XMM2);
+    SFIOR |= (1 << XMM0);
  
+}
+void xmem_write(uint8_t data, uint16_t addr)
+{
+    volatile char *ext_mem = (char *) BASE_ADDRESS;  // Start address for the SRAM
+    ext_mem[addr] = data;
+}
+
+uint8_t xmem_read(uint16_t addr){
+    volatile char *ext_mem = (char *) BASE_ADDRESS;  // Start address for the SRAM
+    uint8_t ret_val = ext_mem[addr];
+    return ret_val;
 }
