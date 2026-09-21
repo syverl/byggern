@@ -5,28 +5,32 @@
 #define F_CPU 4915200UL   // ATmega162 klokkefrekvens - må stemme med resten av prosjektet
 #endif
 
-#include <util/delay.h>
 
-// Beregnet konverteringstid: t_CONV = (9 * N * 2) / f_CLK
-// Med N = 4 kanaler og f_CLK = 2.4576 MHz gir dette ca. 29.3 us.
-// Vi legger på margin for klokkeusikkerhet og tWBD/tBRD-forsinkelser.
-#define ADC_CONV_DELAY_US  35
+#include <avr/io.h>
 
-void adc_max156_start_conversion(void)
+#define ADC_ADDR  ((volatile uint8_t *)0x1000)
+
+uint8_t adc_is_busy(void)
 {
-    xmem_write(0x00, ADC_BASE_ADDRESS);
+    return !(PIND & (1 << PD4));   // BUSY er aktiv lav
 }
 
-void adc_max156_read_all(uint8_t *buffer)
+void adc_max156_init(void)
 {
+    DDRD &= ~(1 << PD4);           // PD4 som inngang
+}
+
+void adc_max156_convert_and_read(uint8_t values[ADC_NUM_CHANNELS])
+{
+    *ADC_ADDR = 0x00;              // starter konvertering
+    uint8_t raw[ADC_NUM_CHANNELS];
+    while (adc_is_busy());                 // vent til BUSY går høy (ferdig)
+
     for (uint8_t i = 0; i < ADC_NUM_CHANNELS; i++) {
-        buffer[i] = xmem_read(ADC_BASE_ADDRESS);
+        raw[i] = *ADC_ADDR;
     }
-}
-
-void adc_max156_convert_and_read(uint8_t *buffer)
-{
-    adc_max156_start_conversion();
-    _delay_us(ADC_CONV_DELAY_US);
-    adc_max156_read_all(buffer);
+    values[0] = (uint8_t)100*(raw[0])/255;
+    values[1] = (uint8_t)100*(raw[1])/255;
+    values[2] = (uint8_t)100*(raw[2]-71)/(242-71);
+    values[3] = (uint8_t)100*(raw[3]-71)/(242-71);
 }
