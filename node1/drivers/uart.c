@@ -1,6 +1,7 @@
-#include <config.h>
-#include <uart.h>
+#include "../config.h"
+#include "uart.h"
 #include <avr/io.h>
+#include <stdio.h>
 
 //Alle funksjonene under er laget i henhold til eksempelkode som er levert
 //i databladet til ATmega162.
@@ -8,12 +9,12 @@
 
 void USART_init(unsigned int ubrr){
 /* Set baud rate */
-UBRR0H = (unsigned char)(ubrr>>8);
-UBRR0L = (unsigned char)ubrr;
+UBRR0H = (unsigned char)(ubrr>>8); //Set the high byte of the baud rate register. AVR-en sender 8 bit
+UBRR0L = (unsigned char)ubrr; // Set lowbytes
 
-UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+UCSR0B = (1<<RXEN0)|(1<<TXEN0); // Enable receiver and transmitter
 /* Set frame format: 8data, 2stop bit */
-UCSR0C = (1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00);
+UCSR0C = (1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00); // Set frame format: 8data, 2stop bit
 }
 
 
@@ -31,4 +32,16 @@ while ( !(UCSR0A & (1<<RXC0)) )
 ;
 /* Get and return received data from buffer */
 return UDR0;
+}
+
+int uart_putchar(char c, FILE *stream) {
+    if (c == '\n') {
+        USART_transmit('\r');   // vanlig å legge til CR før LF for terminaler
+    }
+    USART_transmit(c);
+    return 0;
+}
+
+int uart_getchar(FILE *stream) {
+    return USART_Receive();
 }
