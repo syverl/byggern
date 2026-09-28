@@ -1,10 +1,20 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include "fonts.h"
+#include "input_pos.h"
+#include <util/delay.h>
 #define OLED_SRAM_BASE   0x1400
 #define OLED_PAGE_SIZE   128                        // bytes per page (128 kolonner)
 #define OLED_SRAM        ((volatile uint8_t *)OLED_SRAM_BASE)
 
+
+typedef enum Direction {
+    DOWN = 0, UP, RIGHT, LEFT, NEUTRAL
+} Direction;
+
+typedef enum Game {
+    NORMAL = 0, EASY, DIFF, EXPERT
+} Game;
 
 /* ---------- Funksjoner mot displayet (SPI) ---------- */
 void oled_command(uint8_t cmd);
@@ -24,7 +34,12 @@ void oled_buf_clear_pixel(uint8_t x, uint8_t y);
 void oled_font(char c);
 void oled_print_char(uint8_t page, uint8_t col, char c);
 void oled_print(uint8_t page, uint8_t col, const char *s);
-
+void oled_home(void);
+void check_position(void);
+Direction get_dir(void);
+Game get_game(void);
+void oled_update_select(Game old);
+uint8_t menu_select(void);
 
 
 #define PAGE0  0x1400

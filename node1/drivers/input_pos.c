@@ -34,3 +34,32 @@ void adc_max156_convert_and_read(uint8_t values[ADC_NUM_CHANNELS])
     values[2] = (uint8_t)100*(raw[2]-71)/(242-71);
     values[3] = (uint8_t)100*(raw[3]-71)/(242-71);
 }
+
+volatile uint8_t button_pressed = 0;
+
+void button_init(void) {
+    DDRD  &= ~(1 << PD2);   // inngang
+    PORTD |=  (1 << PD2);   // intern pull-up
+    MCUCR |=  (1 << ISC01); // fallende flanke
+    MCUCR &= ~(1 << ISC00);
+    GICR  |=  (1 << INT0);  // aktiver INT0
+    sei();
+}
+
+ISR(INT0_vect) {
+    button_pressed = 1;
+    printf("button pressed\r\n");
+}
+Buttons b;
+void io_read_buttons(void){
+     PORTB &= ~(1 << SS2);
+
+    SPI_transfer(0x04);
+    _delay_us(40);
+
+    b.right = SPI_transfer(0x00);
+    b.left  = SPI_transfer(0x00);
+    b.nav   = SPI_transfer(0x00);
+
+    PORTB |= (1 << SS2);
+}

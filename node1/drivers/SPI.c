@@ -42,3 +42,10 @@ uint8_t SPI_Read(uint8_t pin)
     PORTB |=  (1<<pin);
     return SPDR;                                // byten som kom inn på MISO
 }
+
+uint8_t SPI_transfer(uint8_t data)
+{
+    SPDR = data;
+    while (!(SPSR & (1 << SPIF)));
+    return SPDR;
+}

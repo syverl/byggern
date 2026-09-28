@@ -105,3 +105,76 @@ void oled_print(uint8_t page, uint8_t col, const char *s)
         col += 8;
     }
 }
+
+void oled_home(void){
+    oled_print(1, 16, "1.Normal mode");
+    oled_print(2, 16, "2.Easy mode");
+    oled_print(3, 16, "3.Diff mode");
+    oled_print(4, 16, "4.Expert mode");
+    oled_update();
+}
+
+
+static Direction  dir  = NEUTRAL;
+static Game game = NORMAL;
+
+void oled_update_select(Game old) {
+    oled_print(old + 1, 0, "  ");   // fjern gammel pil
+    oled_print(game + 1, 0, "=>");  // tegn ny pil
+    oled_update();
+}
+
+void check_position(void) {
+    uint8_t values[ADC_NUM_CHANNELS];
+    adc_max156_convert_and_read(values);
+
+    Game old = game;
+
+    if (values[2] > 75) {
+        dir = UP;
+        if (NORMAL < game) {
+            game -= 1;
+        } else {
+            game = EXPERT;
+        }
+    } else if (values[2] < 25) {
+        dir = DOWN;
+        if (game < EXPERT) {
+            game += 1;
+        } else {
+            game = NORMAL;
+        }
+    } else {
+        dir = NEUTRAL;
+    }
+
+    if (game != old) {
+        oled_update_select(old);
+    }
+}
+
+Direction get_dir(void) {
+    return dir;
+}
+
+Game get_game(void) {
+    return game;
+}
+
+
+uint8_t menu_select(void) {
+    oled_clear();
+    oled_home();
+    oled_print(get_game() + 1, 0, "->");
+    oled_update();
+
+    button_pressed = 0;
+
+    while (!button_pressed) {
+        check_position();
+        _delay_ms(200);
+    }
+
+    button_pressed = 0;
+    return get_game();
+}
