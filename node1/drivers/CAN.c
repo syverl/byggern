@@ -14,7 +14,7 @@ void CAN_init(void){
 
 uint8_t CAN_Read(uint8_t address){
     PORTB &= ~(1<<CS_CAN);
-
+BIT
     SPDR = 0x03;                                
     while (!(SPSR & (1<<SPIF))); 
 
@@ -58,7 +58,7 @@ uint8_t CAN_Read_Status(void){
     
     SPDR = 0x00;
     while (!(SPSR & (1<<SPIF))); 
-
+BIT
     PORTB |=  (1<<CS_CAN);
     return SPDR;
 }
@@ -80,7 +80,7 @@ void CAN_Bit_Modify(uint8_t address, uint8_t data, uint8_t maske){
 
     PORTB |=  (1<<CS_CAN);
 }
-
+// Dette er CAN funksjonene, de over er SPI til MCP2515 kommunikasjon
 void CAN_Controller_Init(void){
     CAN_init();
     CAN_Bit_Modify(0x60, 0x60, 0x60);        // RXB0: ta imot alt

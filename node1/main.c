@@ -42,9 +42,9 @@ int main(void)
     xmem_init();   // Ekstern minne
     pwm_init();    // Klokke
     oled_init();                    // først: nullstill og skru på
-    oled_home();
     adc_max156_init(); //PD4 som inngang. Lese fra BUSY
     button_init();
+    oled_home();
     _delay_ms(10000);
     CAN_test();
     while (1) { }
