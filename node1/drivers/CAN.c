@@ -80,11 +80,16 @@ void CAN_Bit_Modify(uint8_t address, uint8_t data, uint8_t maske){
 
     PORTB |=  (1<<CS_CAN);
 }
-
+// Dette er CAN funksjonene, de over er SPI til MCP2515 kommunikasjon
 void CAN_Controller_Init(void){
     CAN_init();
+
+    CAN_Write(0x03, 0x2A);   // CNF1: SJW=1tq, BRP=3 -> tq = 2*4/16MHz = 0.5us
+    CAN_Write(0xBA, 0x29);   // CNF2: BTLMODE=1, SAM=0, PS1=8tq, Prop=3tq
+    CAN_Write(0x03, 0x28);   // CNF3: PS2=4tq
+
     CAN_Bit_Modify(0x60, 0x60, 0x60);        // RXB0: ta imot alt
-    CAN_Bit_Modify(0x0F, 0x40, 0xE0);        // loopback
+    CAN_Bit_Modify(0x0F, 0x00, 0xE0);        // Normal mode
 
 }
 
