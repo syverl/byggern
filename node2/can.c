@@ -72,18 +72,10 @@ void can_init(CanInit init, uint8_t rxInterrupt){
 
 void can_tx(CanMsg m){
     while(!(CAN0->CAN_MB[txMailbox].CAN_MSR & CAN_MSR_MRDY)){}
-    
-    // Set message ID and use CAN 2.0B protocol
-    CAN0->CAN_MB[txMailbox].CAN_MID = CAN_MID_MIDvA(m.id) | 0 ;
-        
-    // Coerce maximum 8 byte length
+    CAN0->CAN_MB[txMailbox].CAN_MID = CAN_MID_MIDvA(m.id);
     m.length = m.length > 8 ? 8 : m.length;
-    
-    //  Put message in can data registers
     CAN0->CAN_MB[txMailbox].CAN_MDL = m.dword[0];
     CAN0->CAN_MB[txMailbox].CAN_MDH = m.dword[1];
-        
-    // Set message length and mailbox ready to send
     CAN0->CAN_MB[txMailbox].CAN_MCR = (m.length << CAN_MCR_MDLC_Pos) | CAN_MCR_MTCR;
 }
 
@@ -112,7 +104,8 @@ uint8_t can_rx(CanMsg* m){
 
     
 /*
-// Example CAN interrupt handler
+// Example CAN interrupt can_init((CanInit){ .phase2 = 3, .propag = 7, .phase1 = 2, .sjw = 0, .brp = 41 }, 0);
+    printf("CAN_BR = 0x%08lX\n\r", CAN0->CAN_BR);   // forventet: 0x00290273handler
 void CAN0_Handler(void){
     char can_sr = CAN0->CAN_SR; 
     
@@ -130,6 +123,6 @@ void CAN0_Handler(void){
     }
     
     NVIC_ClearPendingIRQ(ID_CAN0);
-} 
+} uint32_t phase1:4;  // Phase 1 segment
 */
 

@@ -45,7 +45,27 @@ int main(void)
     adc_max156_init(); //PD4 som inngang. Lese fra BUSY
     button_init();
     oled_home();
+    CAN_Controller_Init();          // reset + CNF1-3 + normal-modus
     _delay_ms(10000);
-    CAN_test();
-    while (1) { }
+    printf("CANSTAT=%02X CNF=%02X %02X %02X\r\n",
+       CAN_Read(0x0E), CAN_Read(0x2A), CAN_Read(0x29), CAN_Read(0x28));
+    CAN_Message tx = { .id = 0x10, .length = 2, .data = {0xAB, 0xCD} };
+    CAN_Message rx;
+    uint8_t num[4];
+    
+    while (1) {
+        adc_max156_convert_and_read(num);           // fyller num[0..3]
+
+        CAN_Message message = {
+            .id = 0x10,
+            .length = 4,
+            .data = { num[0], num[1], num[2], num[3] }
+        };
+
+        if (!(CAN_Read(0x30) & (1 << 3))) {         // TXB0 ledig?
+            CAN_Send(&message);
+        }
+        _delay_ms(1000);
 }
+}
+

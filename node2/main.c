@@ -22,17 +22,15 @@ int main()
     WDT->WDT_MR = WDT_MR_WDDIS;
     uart_init(F_CPU, BAUD);
     time_spinFor(msecs(5000));
-    can_init((CanInit){ .phase2 = 4, .propag = 3, .phase1 = 8, .sjw = 1, .brp = 4 }, 0);
-    printf("CAN_BR = 0x%08lX\n\r", CAN0->CAN_BR);   // forventet: 0x00140714
+    can_init((CanInit){ .phase2 = 3, .phase1 = 7, .propag = 2, .sjw = 0, .brp = 20 }, 0);
+    printf("CAN_BR = 0x%08lX\n\r", CAN0->CAN_BR);
 
     CanMsg m;
     while (1) {
         if (can_rx(&m)) {
-            can_printmsg(m);                  // vis det som kom fra node 1
-
-            // svar tilbake, så node 1 kan teste mottak
-            CanMsg svar = { .id = 0x20, .length = 1, .byte = {0x55} };
-            can_tx(svar);
+            can_printmsg(m);
+            printf("\r");
         }
-    }
+
+}
 }
