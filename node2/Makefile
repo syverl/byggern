@@ -11,6 +11,7 @@ SOURCE_FILES = \
 	uart.c \
   	can.c \
   	time.c \
+	PWM.c \
 #	filenameN.c
 
 # Feel free to ignore anything below this line

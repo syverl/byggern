@@ -65,7 +65,7 @@ int main(void)
         if (!(CAN_Read(0x30) & (1 << 3))) {         // TXB0 ledig?
             CAN_Send(&message);
         }
-        _delay_ms(1000);
+        _delay_ms(20);
 }
 }
 
