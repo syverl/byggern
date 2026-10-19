@@ -4,6 +4,7 @@
 #include "time.h"
 #include "uart.h"
 #include "can.h"
+#include "PWM.h"
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
  * This starter code will not compile until the UART file has been included in the Makefile. 
@@ -19,18 +20,22 @@
 int main()
 {
     SystemInit();
+    PWM_Init();
     WDT->WDT_MR = WDT_MR_WDDIS;
     uart_init(F_CPU, BAUD);
+    printf("Node 2 startet\n\r");
     time_spinFor(msecs(5000));
     can_init((CanInit){ .phase2 = 3, .phase1 = 7, .propag = 2, .sjw = 0, .brp = 20 }, 0);
     printf("CAN_BR = 0x%08lX\n\r", CAN0->CAN_BR);
-
+    servo_set_us(1500);
     CanMsg m;
     while (1) {
         if (can_rx(&m)) {
-            can_printmsg(m);
-            printf("\r");
+            if (m.id == 0x10) {
+                handle_joystick(&m);
+            }
         }
 
 }
+   
 }

@@ -35,7 +35,6 @@ void oled_init(void)
 
     oled_clear();                    // nullstill SRAM-bufferen
     oled_update();                   // send nullene til displayet
-    oled_command(CMD_INVERSE_DISPLAY);
     oled_command(CMD_DISPLAY_ON);    // skru på til slutt
 }
 
