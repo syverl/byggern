@@ -35,3 +35,4 @@ void handle_joystick(CanMsg *msg) {
 
     servo_set_us(servo_pos); // sender den nye posisjonen til pwm. oppdateres hvert 20_ms periode.
 }
+
