@@ -26,11 +26,11 @@ uint16_t adc_read(void) {
 void ir_skriv(void) {
     uint16_t ir = adc_read();
 
-    if (!ir_brutt && ir < 1000) { //IR-stråle går lav, verdien har falt under 0,81 V
+    if (!ir_brutt && ir < 1500) { //IR-stråle går lav, verdien har falt under 1,2 V
         ir_brutt = 1; //markerer bruddet
         printf("IR er brutt!\n\r");
     }
-    if (ir > 1600) { //IR-ståle går høy igjen, verdien er høyere enn 1,29 V
+    if (ir > 2350) { //IR-ståle går høy igjen, verdien er høyere enn 1,9 V
         ir_brutt = 0; //klar til å registrere nytt brudd
     }
 }
