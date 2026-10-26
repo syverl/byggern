@@ -12,6 +12,7 @@ SOURCE_FILES = \
   	can.c \
   	time.c \
 	PWM.c \
+	IR.c \
 #	filenameN.c
 
 # Feel free to ignore anything below this line

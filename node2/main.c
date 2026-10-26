@@ -5,6 +5,7 @@
 #include "uart.h"
 #include "can.h"
 #include "PWM.h"
+#include "IR.h"
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
  * This starter code will not compile until the UART file has been included in the Makefile. 
@@ -28,14 +29,17 @@ int main()
     can_init((CanInit){ .phase2 = 3, .phase1 = 7, .propag = 2, .sjw = 0, .brp = 20 }, 0);
     printf("CAN_BR = 0x%08lX\n\r", CAN0->CAN_BR);
     servo_set_us(1500);
+    adc_init();
+    printf("ADC klar\n\r");    
     CanMsg m;
+    uint8_t ir_brutt = 0;   
     while (1) {
-        if (can_rx(&m)) {
-            if (m.id == 0x10) {
-                handle_joystick(&m);
-            }
+    if (can_rx(&m)) {
+        if (m.id == 0x10) {
+            handle_joystick(&m);
         }
-
+    }
+    ir_skriv();
 }
    
 }
