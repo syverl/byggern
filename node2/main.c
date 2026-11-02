@@ -6,6 +6,7 @@
 #include "can.h"
 #include "PWM.h"
 #include "IR.h"
+#include "encoder.h"
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
  * This starter code will not compile until the UART file has been included in the Makefile. 
@@ -32,14 +33,20 @@ int main()
     adc_init();
     printf("ADC klar\n\r");    
     CanMsg m;
-    uint8_t ir_brutt = 0;   
+    uint8_t ir_brutt = 0;
+    motor_init();   
+    encoder_init();
     while (1) {
     if (can_rx(&m)) {
         if (m.id == 0x10) {
-            handle_joystick(&m);
+            handle_joystick_vel(&m);
         }
     }
     ir_skriv();
 }
-   
+//     encoder_init();
+//     while (1) {
+//     printf("enc: %ld\r\n", (long)encoder_read());
+//     // liten forsinkelse her
+// }
 }

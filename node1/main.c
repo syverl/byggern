@@ -33,6 +33,10 @@
 // }
 #include "drivers/CAN.h"
 
+uint8_t joystick_button(void) {
+    return (b.nav & (1 << 0)) ? 1 : 0;
+}
+
 int main(void)
 {
     USART_init(MYUBRR);
@@ -52,20 +56,34 @@ int main(void)
     CAN_Message tx = { .id = 0x10, .length = 2, .data = {0xAB, 0xCD} };
     CAN_Message rx;
     uint8_t num[4];
-    
     while (1) {
-        adc_max156_convert_and_read(num);           // fyller num[0..3]
+    adc_max156_convert_and_read(num);   // fyller num[0..3]
+    io_read_buttons();                  // fyller b.right, b.left, b.nav
 
-        CAN_Message message = {
-            .id = 0x10,
-            .length = 4,
-            .data = { num[0], num[1], num[2], num[3] }
-        };
+    CAN_Message message = {
+        .id = 0x10,
+        .length = 5,
+        .data = { num[0], num[1], num[2], num[3], joystick_button() }
+    };
 
-        if (!(CAN_Read(0x30) & (1 << 3))) {         // TXB0 ledig?
-            CAN_Send(&message);
-        }
-        _delay_ms(20);
+    if (!(CAN_Read(0x30) & (1 << 3))) {   // TXB0 ledig?
+        CAN_Send(&message);
+    }
+    _delay_ms(20);
 }
+//     while (1) {
+//         adc_max156_convert_and_read(num);           // fyller num[0..3]
+
+//         CAN_Message message = {
+//             .id = 0x10,
+//             .length = 4,
+//             .data = { num[0], num[1], num[2], num[3] }
+//         };
+
+//         if (!(CAN_Read(0x30) & (1 << 3))) {         // TXB0 ledig?
+//             CAN_Send(&message);
+//         }
+//         _delay_ms(20);
+// }
 }
 

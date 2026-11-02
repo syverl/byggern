@@ -20,7 +20,7 @@ void adc_max156_init(void);
 void adc_max156_convert_and_read(uint8_t values[ADC_NUM_CHANNELS]);
 extern volatile uint8_t button_pressed;
 void button_init(void);
-
+static uint8_t scale_clamped(uint8_t raw, uint8_t min, uint8_t max);
 void io_read_buttons(void);
 typedef struct __attribute__((packed)) {
     union {

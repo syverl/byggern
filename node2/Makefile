@@ -1,5 +1,5 @@
 LDSCRIPT = sam/flash.ld
-BOOTUP = sam/sam3x/source/exceptions.c sam/sam3x/source/startup_sam3x.c sam/sam3x/source/system_sam3x.c
+BOOTUP = sam/sam3x/source/exceptions.c sam/sam3x/source/startup_sam3x.c sam/sam3x/source/system_sam3x.c 
 MCUTYPE = __SAM3X8E__
 # List all source files (i.e. .c files) to be compiled; separate with whitespace.
 # In particular, remember to add the UART and CAN starter files.
@@ -13,6 +13,8 @@ SOURCE_FILES = \
   	time.c \
 	PWM.c \
 	IR.c \
+	encoder.c\
+	solenoid.h\
 #	filenameN.c
 
 # Feel free to ignore anything below this line
