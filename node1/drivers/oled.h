@@ -40,6 +40,10 @@ Direction get_dir(void);
 Game get_game(void);
 void oled_update_select(Game old);
 uint8_t menu_select(void);
+void oled_game_screen(uint8_t mode);
+uint8_t start_liv(uint8_t mode);
+void oled_show_lives(uint8_t liv);
+void oled_lost(void);
 
 
 #define PAGE0  0x1400

@@ -14,7 +14,8 @@ SOURCE_FILES = \
 	PWM.c \
 	IR.c \
 	encoder.c\
-	solenoid.h\
+	solenoid.c\
+	game.c\
 #	filenameN.c
 
 # Feel free to ignore anything below this line

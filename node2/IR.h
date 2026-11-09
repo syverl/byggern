@@ -7,6 +7,6 @@
 
 void adc_init(void);
 uint16_t adc_read(void);
-void ir_skriv(void);
+uint8_t ir_skriv(uint8_t ir_brutt);
 
 #endif

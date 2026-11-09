@@ -33,7 +33,7 @@ static int32_t servo_pos = 1500;   // husker posisjonen mellom meldinger og star
 
 void handle_joystick(CanMsg *msg) {
     int32_t dx = (int32_t)msg->byte[2] - 50;   // -50..50
-    printf("raw: %u  dx: %ld\r\n", msg->byte[2], (long)dx);
+    // printf("raw: %u  dx: %ld\r\n", msg->byte[2], (long)dx);
 
     if (dx > -5 && dx < 5) dx = 0;              // dødsone rundt midten, trekker fra 50 fra 0-100, effektivt flytter sone fra -50 til 50
 
@@ -91,14 +91,19 @@ void handle_joystick_vel(CanMsg *msg) {
     if (sum_e < -500.0f) sum_e = -500.0f;
 
     // 7) Skriv ut sjeldnere, så printf ikke forsinker regulatoren
-    static uint8_t cnt = 0;
-    if (++cnt >= 10) {
-        cnt = 0;
-        printf("u: %d  ref: %ld  enc: %ld\r\n", (int)u, (long)referanse, (long)encoder_read());
-    }
+    // static uint8_t cnt = 0;
+    // if (++cnt >= 10) {
+    //     cnt = 0;
+    //     // printf("u: %d  ref: %ld  enc: %ld\r\n", (int)u, (long)referanse, (long)encoder_read());
+    // }
 
     motor_set((int32_t)u);
-    solenoid_update(msg->byte[4]);
+    solenoid_update(!msg->byte[4]);
+    // static uint8_t prev = 0;
+    // if (msg->byte[4] != prev) {
+    //     // printf("btn: %u\r\n", msg->byte[4]);
+    //     prev = msg->byte[4];
+    // }
 }
 
 
@@ -135,3 +140,6 @@ void motor_init(void){
     PWM->PWM_ENA = PWM_ENA_CHID0;                        // slå på kanal 0
 }
 
+
+    // PMC->PMC_PCER0 |= (1u << ID_PIOB);
+    // PIOB->PIO_SODR = SOL_PIN;     // høy = AV (aktiv lav). Sett før den blir utgang

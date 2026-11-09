@@ -56,6 +56,9 @@ int main(void)
     CAN_Message tx = { .id = 0x10, .length = 2, .data = {0xAB, 0xCD} };
     CAN_Message rx;
     uint8_t num[4];
+    Game game = menu_select();
+    oled_game_screen(game);
+    uint8_t liv = start_liv(game);
     while (1) {
     adc_max156_convert_and_read(num);   // fyller num[0..3]
     io_read_buttons();                  // fyller b.right, b.left, b.nav
@@ -68,6 +71,21 @@ int main(void)
 
     if (!(CAN_Read(0x30) & (1 << 3))) {   // TXB0 ledig?
         CAN_Send(&message);
+    }
+
+    // Node2 sier fra med id 0x30 når IR brytes, data[0] = antall brudd totalt
+    if (CAN_Receive(&rx) && rx.id == 0x30) {
+        uint8_t brudd = rx.data[0];
+        liv = (brudd >= start_liv(game)) ? 0 : start_liv(game) - brudd;
+        printf("Brudd: %u  liv: %u\r\n", brudd, liv);
+        oled_show_lives(liv);
+
+        if (liv == 0) {
+            CAN_Message stopp = { .id = 0x31, .length = 0 };
+            CAN_Send(&stopp);             // node2 stopper motoren
+            oled_lost();
+            while (1) {}                  // spillet er over
+        }
     }
     _delay_ms(20);
 }

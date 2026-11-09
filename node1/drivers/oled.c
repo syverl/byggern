@@ -177,3 +177,43 @@ uint8_t menu_select(void) {
     button_pressed = 0;
     return get_game();
 }
+
+static const uint8_t lives[] = {3, 5, 2, 1};   // startliv per mode
+
+uint8_t start_liv(uint8_t mode)
+{
+    if (mode > 3) mode = 0;
+    return lives[mode];
+}
+
+void oled_show_lives(uint8_t liv)
+{
+    char buf[17];
+    oled_clear_line(2);
+    snprintf(buf, sizeof(buf), "Liv: %u ", liv);
+    oled_print(2, 16, buf);
+    oled_update();
+}
+
+void oled_lost(void)
+{
+    oled_clear();
+    oled_print(3, 32, "YOU LOST");
+    oled_update();
+}
+
+void oled_game_screen(uint8_t mode)
+{
+    static const char *names[] = {"Normal", "Easy", "Diff", "Expert"};
+    char buf[17];
+
+    if (mode > 3) mode = 0;
+
+    oled_clear();
+    oled_print(0, 16, names[mode]);
+
+    snprintf(buf, sizeof(buf), "Liv: %u ", lives[mode]);
+    oled_print(2, 16, buf);
+
+    oled_update();
+}

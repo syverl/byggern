@@ -1,6 +1,10 @@
 #include <sam.h>
 #include "IR.h"
 
+#define IR_TERSKEL  1500
+#define IR_LAV_TID  msecs(30)    
+#define DODTID      seconds(3) 
+
 static uint8_t ir_brutt = 0;
 static uint64_t last_time = 0;
 
@@ -24,13 +28,23 @@ uint16_t adc_read(void) {
     return ADC->ADC_CDR[7];    // siste måling fra kanal 7 
 }
 
-void ir_skriv(void) {
-    uint16_t ir = adc_read();
+uint8_t ir_skriv(uint8_t ir_brutt) {
+    static uint64_t lav_siden = 0;          // 0 = strålen er hel
+    uint16_t ir   = adc_read();
     uint64_t time = time_now();
-    uint64_t time_dif = time - last_time;
-    if (ir < 1500 && time_dif > 3*84000000) { //IR-stråle går lav, verdien har falt under 1,2 V
-        ir_brutt += 1; //markerer bruddet
+
+    if (ir >= IR_TERSKEL) {                 // hel stråle -> nullstill
+        lav_siden = 0;
+        return ir_brutt;
+    }
+    if (lav_siden == 0) {                   // akkurat blitt lav, start klokka
+        lav_siden = time;
+        return ir_brutt;
+    }
+    if (time - lav_siden > IR_LAV_TID && time - last_time > DODTID) {
+        ir_brutt++;
         last_time = time;
-        printf("IR er brutt: %d\n\r", ir_brutt);
-        }
+        printf("IR brutt: %d\n\r", ir_brutt);
+    }
+    return ir_brutt;
 }
