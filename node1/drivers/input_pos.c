@@ -20,23 +20,7 @@ void adc_max156_init(void)
     DDRD &= ~(1 << PD4);           // PD4 som inngang
 }
 
-// void adc_max156_convert_and_read(uint8_t values[ADC_NUM_CHANNELS])
-// {
-//     *ADC_ADDR = 0x00;              // starter konvertering
-//     uint8_t raw[ADC_NUM_CHANNELS];
-//     while (adc_is_busy());                 // vent til BUSY går høy (ferdig)
 
-//     for (uint8_t i = 0; i < ADC_NUM_CHANNELS; i++) {
-//         raw[i] = *ADC_ADDR;
-//     }
-//     if(raw[2] > 200){
-//         raw[2] = 0;
-//     }
-//     values[0] = (uint8_t)100*(raw[0])/255;
-//     values[1] = (uint8_t)100*(raw[1])/255;
-//     values[2] = (uint8_t)100*(raw[2]-71)/(242-71);
-//     values[3] = (uint8_t)100*(raw[3]-71)/(242-71);
-// }
 static uint8_t scale_clamped(uint8_t raw, uint8_t min, uint8_t max)
 {
     int16_t v = (int16_t)raw - min;          // signert, kan bli negativ

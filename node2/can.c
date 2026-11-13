@@ -100,29 +100,3 @@ uint8_t can_rx(CanMsg* m){
     return 1;
 }
     
-    
-
-    
-/*
-// Example CAN interrupt can_init((CanInit){ .phase2 = 3, .propag = 7, .phase1 = 2, .sjw = 0, .brp = 41 }, 0);
-    printf("CAN_BR = 0x%08lX\n\r", CAN0->CAN_BR);   // forventet: 0x00290273handler
-void CAN0_Handler(void){
-    char can_sr = CAN0->CAN_SR; 
-    
-    // RX interrupt
-    if(can_sr & (1 << rxMailbox)){
-        // Add your message-handling code here
-        can_printmsg(can_rx());
-    } else {
-        printf("CAN0 message arrived in non-used mailbox\n\r");
-    }
-    
-    if(can_sr & CAN_SR_MB0){
-        // Disable interrupt
-        CAN0->CAN_IDR = CAN_IER_MB0;
-    }
-    
-    NVIC_ClearPendingIRQ(ID_CAN0);
-} uint32_t phase1:4;  // Phase 1 segment
-*/
-

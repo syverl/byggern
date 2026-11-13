@@ -66,18 +66,18 @@ void handle_joystick_vel(CanMsg *msg) {
     if (referanse < REF_MIN) referanse = REF_MIN;
     if (referanse > REF_MAX) referanse = REF_MAX;
 
-    static float y_prev = 0.0f;              // husker forrige posisjon
+    static float y_prev = 0.0f;              
     float y    = (float)encoder_read();
-    float fart = (y - y_prev) / T;           // tellinger per sekund
+    float fart = (y - y_prev) / T;           
     y_prev = y;
 
     float e = referanse - y;
 
     float K_p = 0.55f;
     float K_i = 0.045f;
-    float K_d = 0.02f;                      // NYTT: demping, juster denne
+    float K_d = 0.02f;                  
 
-    float u = K_p * e + K_i * sum_e - K_d * fart;   // NYTT: - K_d * fart
+    float u = K_p * e + K_i * sum_e - K_d * fart;   
 
     // 5) Friksjonskompensasjon
     if (e >  30.0f) u += 10.0f;
@@ -87,23 +87,11 @@ void handle_joystick_vel(CanMsg *msg) {
     if (u < 100.0f && u > -100.0f) {
         sum_e += e * T;
     }
-    if (sum_e >  500.0f) sum_e =  500.0f;    // NYTT: tak på integralet
+    if (sum_e >  500.0f) sum_e =  500.0f;    //tak på integralet
     if (sum_e < -500.0f) sum_e = -500.0f;
-
-    // 7) Skriv ut sjeldnere, så printf ikke forsinker regulatoren
-    // static uint8_t cnt = 0;
-    // if (++cnt >= 10) {
-    //     cnt = 0;
-    //     // printf("u: %d  ref: %ld  enc: %ld\r\n", (int)u, (long)referanse, (long)encoder_read());
-    // }
 
     motor_set((int32_t)u);
     solenoid_update(!msg->byte[4]);
-    // static uint8_t prev = 0;
-    // if (msg->byte[4] != prev) {
-    //     // printf("btn: %u\r\n", msg->byte[4]);
-    //     prev = msg->byte[4];
-    // }
 }
 
 
@@ -139,7 +127,3 @@ void motor_init(void){
 
     PWM->PWM_ENA = PWM_ENA_CHID0;                        // slå på kanal 0
 }
-
-
-    // PMC->PMC_PCER0 |= (1u << ID_PIOB);
-    // PIOB->PIO_SODR = SOL_PIN;     // høy = AV (aktiv lav). Sett før den blir utgang
